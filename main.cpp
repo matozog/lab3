@@ -9,7 +9,8 @@
 
 #include <iostream>
 #include <stdio.h>
-
+#include <time.h>
+#include <cstdlib>
 #include "Slav.h"
 
 #define REPORT_ADAPTERS showMeAdapterSizes(queueOfSlavs,stackOfSlavs)
@@ -22,10 +23,11 @@ void showMeAdapterSizes(queue <Slav *>, stack <Slav *>);
 
 void containers(Slav *, int);
 void adapters(Slav *, int);
+void sort(Slav * slavs, int n);
 
 int main(int argc, char const *argv[])
 {
-	int n = 2 * atoi(argv[1]);
+	int n = (2 * atoi(argv[1]));
 	Slav *slavs = new Slav[n];
 	cout << "# Generated Slavs" << endl;
 	for (int i = 0; i < n; ++i)
@@ -33,6 +35,7 @@ int main(int argc, char const *argv[])
 
 	containers(slavs, n);
 	adapters(slavs, n);
+	sort(slavs,n);
 
 	delete [] slavs;
 }
@@ -42,27 +45,49 @@ void containers(Slav * slavs, int n)
 	vector <Slav *> vectorOfSlavs;
 	set <Slav *> setOfSlavs;
 	map <Slav *, Slav *> mapOfSlavs;
-	
+	srand(time(NULL));
 	printf("# Containers\n");
 	REPORT_CONTAINERS;
 	printf("## vector\n");
-
+	vectorOfSlavs.push_back(slavs);
 	// Umieść Słowian w losowej kolejności w wektorze.
-
+	for (int i=0; i<n; i++)
+	{
+		int j=rand()%vectorOfSlavs.size();
+		vectorOfSlavs.insert(vectorOfSlavs.begin()+j,&slavs[i]);
+	}
 	// Wykorzystując iterator i funkcję description(), wyświetl wszystkich Słowian w wektorze
-
+	vector <Slav *>::iterator _it;
+	for (_it=vectorOfSlavs.begin(); _it!= vectorOfSlavs.end(); _it++)
+	{
+		cout<<(*_it)->description()<<endl;
+	}
 	REPORT_CONTAINERS;
 	printf("## set\n");
-
 	// Przenieś wszystkich Słowian z wektoru do zbioru.
-	
+	for (int i=0; i<n;i++)
+	{
+		setOfSlavs.insert(vectorOfSlavs[i]);
+
+	}
 	REPORT_CONTAINERS;
 	printf("## map\n");
 
 	// Stwórz słownik tworzący pary Słowian, z tych znajdujących się w zbiorze, czyszcząc zbiór
-	
+	set <Slav *>::iterator it1;
+	for(it1=setOfSlavs.begin(); it1!=setOfSlavs.end() ;it1++)
+	{
+		mapOfSlavs[(*it1)]=*(++it1);
+	}
+	setOfSlavs.clear();
 	// Wykorzystując iterator, wyświetl wszystkie pary Słowian
+	map<Slav *,Slav *>::iterator it3;
+	for(it3=mapOfSlavs.begin(); it3!=mapOfSlavs.end(); it3++)
+	{
+
+		cout<<(*it3).first->description()<<" "<<(*it3).second->description()<<endl;
 	
+	}
 	REPORT_CONTAINERS;
 }
 
@@ -76,16 +101,28 @@ void adapters(Slav * slavs, int n)
 	printf("## queue\n");
 
 	// Umieść Słowian w kolejce.
-	
+	for(int i=0; i<n; i++)
+	{
+		queueOfSlavs.push(slavs+i);
+	}
 	REPORT_ADAPTERS;
 
 	printf("## stack\n");
 	// Przenieś Słowian z kolejki do stosu.
+	while(queueOfSlavs.size())
+	{
+		stackOfSlavs.push(queueOfSlavs.front());
+		queueOfSlavs.pop();
 
+	}
 	REPORT_ADAPTERS;
 
 	// Wyświetl Słowian zdejmowanych ze stosu.
-
+	while(stackOfSlavs.size())
+	{
+		cout<<stackOfSlavs.top()->description()<<endl;
+		stackOfSlavs.pop();
+	} 
 	REPORT_ADAPTERS;
 }
 
@@ -105,4 +142,13 @@ void showMeAdapterSizes(queue <Slav *> queue, stack <Slav *> stack)
 		stack.size(),
 		Slav::counter());
 
+}
+void sort(Slav * slavs, int n)
+{
+	map<sex, vector<Slav *>> mySlavs;
+	for (int i=0; i<n; i++)
+	{
+		if(slavs[i].get()==famale) mySlavs[famale].push_back(&slavs[i]);
+		else mySlavs[male].push_back(&slavs[i]);
+	}
 }

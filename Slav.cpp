@@ -1,5 +1,8 @@
 #include "Slav.h"
 #include <fstream>
+#include <iterator>
+#include <time.h>
+#include <cstdlib>
 
 using namespace std;
 
@@ -19,6 +22,8 @@ void Slav::init()
 Slav::Slav()
 {
 	static int amountOfNames = (init(), names.size());
+	// lazy initialization, wykonuje sie tylko raz w programie,
+	//zmiennej zostanie przypisana wartość funkcji name.size().
 	_name = names[rand() % amountOfNames];
 	_id = _counter++;
 }
@@ -26,4 +31,9 @@ Slav::Slav()
 string Slav::description()
 {
 	return string("  ") + _name + " [" + to_string(_id) + "]";
+}
+sex Slav::get()
+{
+	if(_name.back()=='a') return famale;
+	return male;
 }
